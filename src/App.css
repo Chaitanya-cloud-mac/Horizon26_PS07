@@ -349,7 +349,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--bg-secondary);
+  background: rgba(255, 255, 255, 0.05); /* Lighter distinct background to contrast with black */
 }
 
 .peg-slot.active {
@@ -401,12 +401,12 @@
 
 .feedback-pip.exact {
   background: var(--exact-color);
-  border-color: var(--exact-color);
+  border-color: rgba(128, 128, 128, 0.6);
 }
 
 .feedback-pip.partial {
   background: var(--partial-color);
-  border-color: var(--partial-color);
+  border-color: rgba(128, 128, 128, 0.6);
 }
 
 /* ─── Colour Palette ──────────────────────────────────────────────────────── */
