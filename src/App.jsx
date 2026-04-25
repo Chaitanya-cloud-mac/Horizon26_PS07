@@ -558,7 +558,7 @@ export default function App() {
 
   // ── Hint Handler ───────────────────────────────────────────────────────
   const useHint = () => {
-    if (view !== 'playing' || gameResult) return;
+    if (view !== 'playing' || gameResult || hintsUsed >= 3) return;
     // Find slot indices not yet revealed
     const unrevealed = [];
     for (let i = 0; i < config.slots; i++) {
@@ -581,7 +581,7 @@ export default function App() {
     });
   };
 
-  const hintsAvailable = config ? config.slots - 1 - hintsUsed : 0;
+  const hintsAvailable = config ? Math.min(3, config.slots - 1) - hintsUsed : 0;
 
   // ── Render Helpers ──────────────────────────────────────────────────────
   const allSlotsFilled = currentGuess.every((c) => c !== -1);
@@ -920,7 +920,9 @@ export default function App() {
             onClick={() => setSymbolMode((s) => !s)}
             aria-label="Toggle symbol overlay"
           >
-            ◆
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-15.5c-.83 0-1.5.67-1.5 1.5s.67 1.5 1.5 1.5 1.5-.67 1.5-1.5-.67-1.5-1.5-1.5zM19 9h-4.25v10h-1.5v-5h-2.5v5h-1.5V9H5V7h14v2z"/>
+            </svg>
           </button>
           {/* Theme toggle: hidden checkbox + label — cross-browser reliable */}
           <input
