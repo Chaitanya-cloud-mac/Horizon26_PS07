@@ -8,27 +8,7 @@
   overflow: hidden;
 }
 
-/* Decorative gradient orbs */
-.app-wrapper::before,
-.app-wrapper::after {
-  content: '';
-  position: fixed;
-  border-radius: 50%;
-  pointer-events: none;
-  filter: blur(100px);
-  opacity: .12;
-  z-index: 0;
-}
-.app-wrapper::before {
-  width: 600px; height: 600px;
-  top: -200px; right: -200px;
-  background: var(--accent-1);
-}
-.app-wrapper::after {
-  width: 500px; height: 500px;
-  bottom: -150px; left: -150px;
-  background: var(--accent-2);
-}
+/* Decorative gradient orbs removed for solid matte theme */
 
 /* ─── Header ───────────────────────────────────────────────────────────────── */
 .app-header {
@@ -61,29 +41,71 @@
   gap: 12px;
 }
 
-/* ─── Theme Toggle ─────────────────────────────────────────────────────────── */
-.theme-toggle {
-  background: var(--bg-elevated);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-full);
-  width: 44px;
-  height: 24px;
-  cursor: pointer;
-  position: relative;
-  transition: background var(--transition-fast);
-}
-.theme-toggle::after {
-  content: '';
+/* ─── Theme Toggle — checkbox + label (cross-browser safe) ─────────────────── */
+
+/* Hide the native checkbox entirely but keep it accessible */
+.theme-toggle-input {
   position: absolute;
-  top: 2px; left: 2px;
-  width: 20px; height: 20px;
-  border-radius: 50%;
-  background: var(--accent-gradient);
-  transition: transform var(--transition-base);
-  box-shadow: var(--shadow-sm);
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+  margin: 0;
+  padding: 0;
 }
-.theme-toggle.light::after {
-  transform: translateX(20px);
+
+/* The visible pill track — rendered by a <label> */
+.theme-toggle-label {
+  display: inline-flex;
+  align-items: center;
+  width: 48px;
+  height: 26px;
+  border-radius: 9999px;
+  border: 1.5px solid var(--border-subtle);
+  background: var(--bg-elevated);
+  cursor: pointer;
+  padding: 3px;
+  box-sizing: border-box;
+  transition: background 0.2s ease, border-color 0.2s ease;
+  flex-shrink: 0;
+}
+
+/* The sliding thumb — a plain <span> inside the label */
+.theme-toggle-thumb {
+  display: block;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+  box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  flex-shrink: 0;
+  /* Icon inside thumb via emoji unicode — no extra elements */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  line-height: 1;
+  user-select: none;
+}
+
+/* When checkbox is checked (light mode) — slide the thumb right */
+.theme-toggle-input:checked + .theme-toggle-label .theme-toggle-thumb {
+  transform: translateX(22px);
+}
+
+/* Subtle track highlight when in light mode */
+.theme-toggle-input:checked + .theme-toggle-label {
+  background: var(--bg-secondary);
+  border-color: var(--accent-1);
+}
+
+/* Focus-visible ring for keyboard navigation */
+.theme-toggle-input:focus-visible + .theme-toggle-label {
+  outline: 2px solid var(--accent-2);
+  outline-offset: 2px;
 }
 
 /* ─── Icon Buttons ─────────────────────────────────────────────────────────── */
@@ -93,19 +115,16 @@
   align-items: center;
   justify-content: center;
   border-radius: var(--radius-sm);
-  border: 1px solid var(--border-subtle);
-  background: var(--bg-elevated);
-  color: var(--text-secondary);
+  border: none;
+  background: transparent;
   cursor: pointer;
-  transition: all var(--transition-fast);
-  font-size: 1.1rem;
+  transition: transform var(--transition-fast), opacity var(--transition-fast);
+  font-size: 1.3rem;
+  padding: 0;
 }
 .icon-btn:hover {
-  background: var(--accent-1);
-  color: #fff;
-  border-color: var(--accent-1);
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-md);
+  transform: scale(1.2);
+  opacity: 0.8;
 }
 
 /* ─── Main Content ─────────────────────────────────────────────────────────── */

@@ -14,32 +14,32 @@ body {
 /* ─── Theme Tokens — Dark (default) ────────────────────────────────────────── */
 :root {
   /* Surfaces */
-  --bg-primary:   hsl(210, 22%, 8%);
-  --bg-secondary: hsl(210, 18%, 12%);
-  --bg-card:      hsl(210, 16%, 15%);
-  --bg-elevated:  hsl(210, 14%, 18%);
-  --bg-glass:     hsla(210, 16%, 15%, .55);
+  --bg-primary:   #18181a;
+  --bg-secondary: #222224;
+  --bg-card:      #2a2a2c;
+  --bg-elevated:  #323234;
+  --bg-glass:     #2a2a2c; /* Solid matte, no glass opacity */
 
   /* Text */
-  --text-primary:   hsl(210, 20%, 92%);
-  --text-secondary: hsl(210, 14%, 62%);
-  --text-muted:     hsl(210, 10%, 42%);
+  --text-primary:   #e4e4e7;
+  --text-secondary: #a1a1aa;
+  --text-muted:     #71717a;
 
-  /* Accents — warm teal / cyan gradient, no purple */
-  --accent-1: hsl(174, 62%, 42%);          /* teal */
-  --accent-2: hsl(196, 72%, 48%);          /* cyan */
-  --accent-gradient: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+  /* Accents */
+  --accent-1: #3b82f6;          /* Matte blue */
+  --accent-2: #3b82f6;          
+  --accent-gradient: var(--accent-1); /* Solid color instead of gradient */
 
   /* Feedback pegs */
   --exact-color:   hsl(140, 70%, 50%);
   --partial-color: hsl(42, 95%, 58%);
 
   /* Borders & shadows */
-  --border-subtle: hsla(210, 14%, 40%, .25);
-  --shadow-sm: 0 1px  3px hsla(0,0%,0%,.3);
-  --shadow-md: 0 4px 12px hsla(0,0%,0%,.4);
-  --shadow-lg: 0 8px 32px hsla(0,0%,0%,.5);
-  --shadow-glow: 0 0 24px hsla(174, 62%, 42%, .25);
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --shadow-sm: 0 1px  3px rgba(0,0,0,.2);
+  --shadow-md: 0 4px 12px rgba(0,0,0,.3);
+  --shadow-lg: 0 8px 32px rgba(0,0,0,.4);
+  --shadow-glow: none;
 
   /* Misc */
   --radius-sm: 8px;

@@ -562,12 +562,24 @@ export default function App() {
           >
             🏆
           </button>
-          <button
-            className={`theme-toggle${theme === 'light' ? ' light' : ''}`}
-            title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
-            onClick={() => setTheme((t) => (t === 'dark' ? 'light' : 'dark'))}
-            aria-label="Toggle theme"
+          {/* Theme toggle: hidden checkbox + label — cross-browser reliable */}
+          <input
+            id="theme-toggle-cb"
+            type="checkbox"
+            className="theme-toggle-input"
+            checked={theme === 'light'}
+            onChange={() => setTheme((t) => (t === 'dark' ? 'light' : 'dark'))}
+            aria-label="Toggle light/dark theme"
           />
+          <label
+            htmlFor="theme-toggle-cb"
+            className="theme-toggle-label"
+            title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+          >
+            <span className="theme-toggle-thumb">
+              {theme === 'dark' ? '🌙' : '☀️'}
+            </span>
+          </label>
         </div>
       </header>
 
