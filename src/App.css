@@ -551,13 +551,50 @@
   animation: slideUp .4s ease both, celebratePulse 2s ease infinite .5s;
 }
 
-/* ── Lose animation sequence ── */
+/* ── Lose animation — dramatic & sad ── */
 .game-over-overlay.lose {
-  animation: fadeIn .05s ease both, loseShake .25s ease .05s both, loseDesaturate .5s ease .3s both;
+  background: hsla(0, 30%, 5%, .75);
+  backdrop-filter: blur(14px) grayscale(80%) brightness(0.6);
+  -webkit-backdrop-filter: blur(14px) grayscale(80%) brightness(0.6);
+  animation: fadeIn .4s ease both;
 }
 
 .game-over-card.lose {
-  animation: loseFallIn .45s ease .3s both;
+  animation: loseCardEnter .9s cubic-bezier(.22, 1, .36, 1) both;
+  border-color: hsla(0, 50%, 40%, .3);
+  box-shadow: 0 8px 40px hsla(0, 60%, 20%, .5), inset 0 0 60px hsla(0, 40%, 10%, .15);
+}
+
+.game-over-card.lose .game-over-title {
+  color: hsl(0, 50%, 60%);
+}
+
+.game-over-card.lose .game-over-sub {
+  color: var(--text-muted);
+}
+
+/* ─── Rain Overlay ─────────────────────────────────────────────────────────── */
+.rain-overlay {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1001;
+  overflow: hidden;
+}
+
+.rain-drop {
+  position: absolute;
+  top: -30px;
+  width: 1.5px;
+  background: linear-gradient(to bottom, transparent, rgba(180, 200, 220, 0.5));
+  border-radius: 0 0 2px 2px;
+  filter: blur(0.5px);
+  animation: rainFall linear infinite;
+}
+
+@keyframes rainFall {
+  0%   { transform: translateY(-30px); }
+  100% { transform: translateY(105vh); }
 }
 
 .game-over-emoji {

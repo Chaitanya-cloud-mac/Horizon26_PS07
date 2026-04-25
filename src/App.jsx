@@ -9,6 +9,7 @@ import {
   evaluateGuess,
   addScore,
   getLeaderboard,
+  calculateScore,
 } from './logic/engine';
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -31,6 +32,75 @@ function fireConfetti() {
   fire(0.35, { spread: 100, decay: 0.91, scalar: 0.8 });
   fire(0.1,  { spread: 120, startVelocity: 25, decay: 0.92, scalar: 1.2 });
   fire(0.1,  { spread: 120, startVelocity: 45 });
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Rain Overlay — subtle drizzle for the lose screen
+   Drops are generated at module scope to satisfy react-hooks/purity.
+   ═══════════════════════════════════════════════════════════════════════════ */
+const RAIN_DROPS = Array.from({ length: 80 }, (_, i) => ({
+  id: i,
+  left: `${Math.random() * 100}%`,
+  duration: `${0.5 + Math.random() * 0.6}s`,
+  delay: `${Math.random() * 2}s`,
+  height: `${12 + Math.random() * 18}px`,
+  opacity: 0.15 + Math.random() * 0.2,
+}));
+
+function RainOverlay() {
+  useEffect(() => {
+    // Soft rain ambient sound via Web Audio API
+    let ctx, src, gain;
+    try {
+      ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const bufferSize = 2 * ctx.sampleRate; // 2 seconds of noise
+      const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+      const data = buffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++) {
+        data[i] = Math.random() * 2 - 1;
+      }
+      src = ctx.createBufferSource();
+      src.buffer = buffer;
+      src.loop = true;
+
+      // Bandpass filter to make it sound like rain (not harsh static)
+      const filter = ctx.createBiquadFilter();
+      filter.type = 'bandpass';
+      filter.frequency.value = 800;
+      filter.Q.value = 0.5;
+
+      gain = ctx.createGain();
+      gain.gain.value = 0.06; // Very quiet
+
+      src.connect(filter);
+      filter.connect(gain);
+      gain.connect(ctx.destination);
+      src.start();
+    } catch (_) {
+      // Audio not supported — rain still plays visually
+    }
+    return () => {
+      try { src?.stop(); ctx?.close(); } catch (_) { /* cleanup */ }
+    };
+  }, []);
+
+  return (
+    <div className="rain-overlay">
+      {RAIN_DROPS.map((d) => (
+        <div
+          key={d.id}
+          className="rain-drop"
+          style={{
+            left: d.left,
+            height: d.height,
+            opacity: d.opacity,
+            animationDuration: d.duration,
+            animationDelay: d.delay,
+          }}
+        />
+      ))}
+    </div>
+  );
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -166,24 +236,26 @@ function GameOverOverlay({ won, secret, guessCount, timeLeft, difficulty, onPlay
   const [name, setName] = useState('');
   const [saved, setSaved] = useState(false);
 
-  // Fire a single confetti burst on mount if the player won
+  // Fire confetti on win
   useEffect(() => {
     if (won) fireConfetti();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleSave = () => {
     if (!name.trim()) return;
-    addScore(difficulty, name.trim(), guessCount, timeLeft);
+    addScore(difficulty, name.trim(), guessCount, timeLeft, won);
     setSaved(true);
   };
 
   const mins = Math.floor(timeLeft / 60);
   const secs = timeLeft % 60;
   const timeString = `${mins} minute${mins !== 1 ? 's' : ''} and ${secs} second${secs !== 1 ? 's' : ''}`;
+  const score = calculateScore(won, difficulty, guessCount, timeLeft);
 
   return (
     <>
       <div className={`game-over-overlay${won ? '' : ' lose'}`}>
+        {!won && <RainOverlay />}
         <div className={`game-over-card${won ? ' win' : ' lose'}`}>
           <div className="game-over-emoji">{won ? '🎉' : '😔'}</div>
           <h2 className="game-over-title">{won ? 'Brilliant!' : 'Game Over'}</h2>
@@ -192,6 +264,10 @@ function GameOverOverlay({ won, secret, guessCount, timeLeft, difficulty, onPlay
               ? `You cracked the code in ${guessCount} guess${guessCount > 1 ? 'es' : ''} with ${timeString} remaining!`
               : 'The secret code was:'}
           </p>
+
+          <div className="game-over-score" style={{ fontSize: '1.5rem', fontWeight: 'bold', margin: '15px 0', color: won ? 'var(--accent-1)' : 'var(--text-muted)' }}>
+            Score: {score}
+          </div>
 
           {!won && (
             <div className="secret-reveal" style={{ marginBottom: 20 }}>

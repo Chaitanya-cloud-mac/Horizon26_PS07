@@ -139,23 +139,48 @@ function saveAllScores(data) {
 }
 
 /**
+ * Calculate the score based on game outcome, difficulty, guesses, and time.
+ */
+export function calculateScore(won, difficultyKey, guessCount, timeLeft) {
+  const { maxGuesses } = DIFFICULTIES[difficultyKey];
+  let score = 0;
+  
+  if (won) {
+    score += 100; // Base win score
+    score += (maxGuesses - guessCount) * 50; // Bonus for unused guesses
+    score += Math.floor(timeLeft * 1); // Bonus for time remaining
+  } else {
+    score += guessCount * 5; // Points for effort/guesses made
+    score += Math.floor(timeLeft * 0.2); // Points for time survived
+  }
+
+  const multipliers = { easy: 1, medium: 1.5, hard: 2 };
+  return Math.floor(score * (multipliers[difficultyKey] || 1));
+}
+
+/**
  * Add a score entry and return the updated top-10 for that tier.
  */
-export function addScore(difficultyKey, name, guessCount, timeRemaining) {
+export function addScore(difficultyKey, name, guessCount, timeRemaining, won) {
   const all = loadAllScores();
   if (!all[difficultyKey]) all[difficultyKey] = [];
+
+  const score = calculateScore(won, difficultyKey, guessCount, timeRemaining);
 
   all[difficultyKey].push({
     name,
     guesses: guessCount,
     timeRemaining,
+    score,
     date: new Date().toISOString(),
   });
 
-  // Sort: fewer guesses is better; tie-break by more time remaining
+  // Sort: higher score is better
   all[difficultyKey].sort((a, b) => {
-    if (a.guesses !== b.guesses) return a.guesses - b.guesses;
-    return b.timeRemaining - a.timeRemaining;
+    // Fallback sorting for old data without score
+    const scoreA = a.score !== undefined ? a.score : -a.guesses;
+    const scoreB = b.score !== undefined ? b.score : -b.guesses;
+    return scoreB - scoreA;
   });
 
   // Keep top 10
