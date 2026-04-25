@@ -537,7 +537,7 @@ export default function App() {
           <div className="board-header">
             <span className="board-header-label">{DIFFICULTIES[difficulty].label} Mode</span>
             <span className="guess-counter">
-              Guess <span>{guesses.length}</span> / {config.maxGuesses}
+              Guess <span>{gameResult ? guesses.length : Math.min(guesses.length + 1, config.maxGuesses)}</span> / {config.maxGuesses}
             </span>
           </div>
           {rows}
