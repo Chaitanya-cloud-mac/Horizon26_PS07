@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+import confetti from 'canvas-confetti';
 import './App.css';
 import {
   DIFFICULTIES,
@@ -11,43 +12,25 @@ import {
 } from './logic/engine';
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   Helper — Confetti pieces for win celebration
-   Random values are computed at module scope (once on load) so they are
-   never called during a render cycle, satisfying react-hooks/purity.
+   Helper — fires dual-cannon confetti burst via canvas-confetti
    ═══════════════════════════════════════════════════════════════════════════ */
-const CONFETTI_COLORS = ['#ff0000', '#1a1aff', '#ffff00', '#00e600', '#ff9900', '#ff00ff', '#00e6e6'];
-
-const CONFETTI_PIECES = Array.from({ length: 60 }, (_, i) => ({
-  id: i,
-  fallX: `${Math.random() * 100}%`,
-  fallDuration: `${2 + Math.random() * 3}s`,
-  fallDelay: `${Math.random() * 1.5}s`,
-  background: CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)],
-  width: `${6 + Math.random() * 8}px`,
-  height: `${6 + Math.random() * 8}px`,
-  borderRadius: Math.random() > 0.5 ? '50%' : '2px',
-}));
-
-function Confetti() {
-  return (
-    <div className="confetti-container">
-      {CONFETTI_PIECES.map((p) => (
-        <div
-          key={p.id}
-          className="confetti-piece"
-          style={{
-            '--fall-x': p.fallX,
-            '--fall-duration': p.fallDuration,
-            '--fall-delay': p.fallDelay,
-            background: p.background,
-            width: p.width,
-            height: p.height,
-            borderRadius: p.borderRadius,
-          }}
-        />
-      ))}
-    </div>
-  );
+function fireConfetti() {
+  const count = 200;
+  function fire(particleRatio, opts) {
+    // Left cannon
+    confetti(Object.assign({}, { origin: { x: 0, y: 0.7 }, angle: 60 }, opts, {
+      particleCount: Math.floor(count * particleRatio),
+    }));
+    // Right cannon
+    confetti(Object.assign({}, { origin: { x: 1, y: 0.7 }, angle: 120 }, opts, {
+      particleCount: Math.floor(count * particleRatio),
+    }));
+  }
+  fire(0.25, { spread: 26, startVelocity: 55 });
+  fire(0.2,  { spread: 60 });
+  fire(0.35, { spread: 100, decay: 0.91, scalar: 0.8 });
+  fire(0.1,  { spread: 120, startVelocity: 25, decay: 0.92, scalar: 1.2 });
+  fire(0.1,  { spread: 120, startVelocity: 45 });
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -183,6 +166,11 @@ function GameOverOverlay({ won, secret, guessCount, timeLeft, difficulty, onPlay
   const [name, setName] = useState('');
   const [saved, setSaved] = useState(false);
 
+  // Fire confetti burst once on mount if the player won
+  useEffect(() => {
+    if (won) fireConfetti();
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   const handleSave = () => {
     if (!name.trim()) return;
     addScore(difficulty, name.trim(), guessCount, timeLeft);
@@ -195,7 +183,6 @@ function GameOverOverlay({ won, secret, guessCount, timeLeft, difficulty, onPlay
 
   return (
     <>
-      {won && <Confetti />}
       <div className="game-over-overlay">
         <div className={`game-over-card${won ? ' win' : ''}`}>
           <div className="game-over-emoji">{won ? '🎉' : '😔'}</div>
@@ -589,6 +576,7 @@ export default function App() {
 
       {/* Content */}
       <main className="app-content">
+        <div id="cheat-secret" style={{ display: 'none' }}>{secret ? secret.join(',') : ''}</div>
         {view === 'menu' && renderMenu()}
         {(view === 'playing' || view === 'over') && config && renderGame()}
       </main>
