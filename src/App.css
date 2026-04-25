@@ -377,6 +377,56 @@
   height: 100%;
   border-radius: 50%;
   transition: background var(--transition-fast), transform var(--transition-fast);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ─── Symbol Overlay (Accessibility) ───────────────────────────────────────── */
+.peg-symbol {
+  position: absolute;
+  font-size: .85em;
+  font-weight: 900;
+  color: var(--text-primary);
+  text-shadow: none;
+  pointer-events: none;
+  line-height: 1;
+  user-select: none;
+}
+
+/* When a peg has a symbol, give it a visible border so it looks distinct from empty */
+.peg-inner:has(.peg-symbol) {
+  border: 1.5px solid var(--border-subtle);
+}
+
+.palette-swatch {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.palette-swatch .peg-symbol {
+  font-size: .7em;
+}
+
+.secret-peg {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.secret-peg .peg-symbol {
+  position: static;
+  font-size: .85em;
+}
+
+.icon-btn.active {
+  background: hsla(174, 62%, 42%, .2);
+  color: var(--accent-1);
+  box-shadow: 0 0 8px hsla(174, 62%, 42%, .3);
 }
 
 .peg-slot.filled .peg-inner {

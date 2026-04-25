@@ -13,6 +13,11 @@ import {
 } from './logic/engine';
 
 /* ═══════════════════════════════════════════════════════════════════════════
+   Geometric symbols for accessibility overlay — one per colour slot
+   ═══════════════════════════════════════════════════════════════════════════ */
+const SYMBOLS = ['●', '■', '▲', '◆', '✚', '★', '▼', '✖'];
+
+/* ═══════════════════════════════════════════════════════════════════════════
    Helper — fires dual-cannon confetti burst via canvas-confetti
    ═══════════════════════════════════════════════════════════════════════════ */
 function fireConfetti() {
@@ -234,7 +239,7 @@ function LeaderboardModal({ onClose }) {
 /* ═══════════════════════════════════════════════════════════════════════════
    Game Over Overlay
    ═══════════════════════════════════════════════════════════════════════════ */
-function GameOverOverlay({ won, secret, guessCount, timeLeft, difficulty, hintsUsed, onPlayAgain, onMenu }) {
+function GameOverOverlay({ won, secret, guessCount, timeLeft, difficulty, hintsUsed, symbolMode, onPlayAgain, onMenu }) {
   const [name, setName] = useState('');
   const [saved, setSaved] = useState(false);
 
@@ -282,8 +287,10 @@ function GameOverOverlay({ won, secret, guessCount, timeLeft, difficulty, hintsU
                 <div
                   key={i}
                   className="secret-peg"
-                  style={{ background: COLOR_POOL[colorId].hex }}
-                />
+                  style={{ background: symbolMode ? 'var(--bg-card)' : COLOR_POOL[colorId].hex }}
+                >
+                  {symbolMode && SYMBOLS[colorId] && <span className="peg-symbol">{SYMBOLS[colorId]}</span>}
+                </div>
               ))}
             </div>
           )}
@@ -321,10 +328,23 @@ function GameOverOverlay({ won, secret, guessCount, timeLeft, difficulty, hintsU
 export default function App() {
   // ── Theme ────────────────────────────────────────────────────────────────
   const [theme, setTheme] = useState(() => localStorage.getItem('mm_theme') || 'dark');
+  const [symbolMode, setSymbolMode] = useState(() => localStorage.getItem('mm_symbols') === 'true');
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
     localStorage.setItem('mm_theme', theme);
   }, [theme]);
+  useEffect(() => {
+    localStorage.setItem('mm_symbols', symbolMode);
+  }, [symbolMode]);
+
+  /** Renders a geometric symbol overlay on a peg when symbol mode is on */
+  const sym = (colorId) => {
+    if (!symbolMode || colorId < 0) return null;
+    return <span className="peg-symbol">{SYMBOLS[colorId] || '?'}</span>;
+  };
+
+  /** Returns the peg background — neutral gray in symbol mode, colour otherwise */
+  const pegBg = (hex) => symbolMode ? 'var(--bg-card)' : hex;
 
   // ── Views ────────────────────────────────────────────────────────────────
   const [view, setView] = useState('menu');           // 'menu' | 'playing' | 'over' | 'challenge-create'
@@ -656,8 +676,8 @@ export default function App() {
             >
               <div
                 className="peg-inner"
-                style={colorId >= 0 ? { background: COLOR_POOL[colorId].hex } : {}}
-              />
+                style={colorId >= 0 ? { background: pegBg(COLOR_POOL[colorId].hex) } : {}}
+              >{sym(colorId)}</div>
             </div>
           ))}
         </div>
@@ -683,9 +703,11 @@ export default function App() {
                 setChallengeLink('');
                 setLinkCopied(false);
               }}
-              style={{ background: c.hex, '--swatch-glow': c.hex + '80' }}
+              style={{ background: pegBg(c.hex), '--swatch-glow': symbolMode ? 'transparent' : c.hex + '80' }}
               title={c.name}
-            />
+            >
+              {sym(c.id)}
+            </div>
           ))}
         </div>
 
@@ -741,7 +763,7 @@ export default function App() {
           <div className="row-slots">
             {g.colors.map((colorId, j) => (
               <div key={j} className="peg-slot filled">
-                <div className="peg-inner" style={{ background: COLOR_POOL[colorId].hex }} />
+                <div className="peg-inner" style={{ background: pegBg(COLOR_POOL[colorId].hex) }}>{sym(colorId)}</div>
               </div>
             ))}
           </div>
@@ -769,8 +791,8 @@ export default function App() {
               >
                 <div
                   className="peg-inner"
-                  style={colorId >= 0 ? { background: COLOR_POOL[colorId].hex } : {}}
-                />
+                  style={colorId >= 0 ? { background: pegBg(COLOR_POOL[colorId].hex) } : {}}
+                >{sym(colorId)}</div>
               </div>
             ))}
           </div>
@@ -824,9 +846,11 @@ export default function App() {
                   const emptyIdx = currentGuess.indexOf(-1);
                   if (emptyIdx !== -1) setSlotColor(emptyIdx, c.id);
                 }}
-                style={{ background: c.hex, '--swatch-glow': c.hex + '80' }}
+                style={{ background: pegBg(c.hex), '--swatch-glow': symbolMode ? 'transparent' : c.hex + '80' }}
                 title={c.name}
-              />
+              >
+                {sym(c.id)}
+              </div>
             ))}
           </div>
 
@@ -890,6 +914,14 @@ export default function App() {
           >
             🏆
           </button>
+          <button
+            className={`icon-btn${symbolMode ? ' active' : ''}`}
+            title={symbolMode ? 'Disable symbol overlay' : 'Enable symbol overlay (accessibility)'}
+            onClick={() => setSymbolMode((s) => !s)}
+            aria-label="Toggle symbol overlay"
+          >
+            ◆
+          </button>
           {/* Theme toggle: hidden checkbox + label — cross-browser reliable */}
           <input
             id="theme-toggle-cb"
@@ -927,6 +959,7 @@ export default function App() {
           timeLeft={timeLeft}
           difficulty={difficulty}
           hintsUsed={hintsUsed}
+          symbolMode={symbolMode}
           onPlayAgain={() => startGame(difficulty)}
           onMenu={() => { setView('menu'); setGameResult(null); }}
         />
