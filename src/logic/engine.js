@@ -41,14 +41,14 @@ export const DIFFICULTIES = {
 // Colours are curated HSL values — vibrant but harmonious, no purple.
 
 export const COLOR_POOL = [
-  { id: 0, name: 'Crimson',   hex: '#E63946' },
-  { id: 1, name: 'Tangerine', hex: '#F77F00' },
-  { id: 2, name: 'Gold',      hex: '#FCBF49' },
-  { id: 3, name: 'Emerald',   hex: '#2A9D8F' },
-  { id: 4, name: 'Sky',       hex: '#219EBC' },
-  { id: 5, name: 'Navy',      hex: '#023047' },
-  { id: 6, name: 'Rose',      hex: '#E76F51' },
-  { id: 7, name: 'Slate',     hex: '#577590' },
+  { id: 0, name: 'Red',       hex: '#ff0000' },
+  { id: 1, name: 'Blue',      hex: '#1a1aff' },
+  { id: 2, name: 'Yellow',    hex: '#ffff00' },
+  { id: 3, name: 'Green',     hex: '#00e600' },
+  { id: 4, name: 'Orange',    hex: '#ff9900' },
+  { id: 5, name: 'Magenta',   hex: '#ff00ff' },
+  { id: 6, name: 'Cyan',      hex: '#00e6e6' },
+  { id: 7, name: 'Brown',     hex: '#663300' },
 ];
 
 /**

@@ -15,7 +15,7 @@ import {
    Random values are computed at module scope (once on load) so they are
    never called during a render cycle, satisfying react-hooks/purity.
    ═══════════════════════════════════════════════════════════════════════════ */
-const CONFETTI_COLORS = ['#E63946', '#F77F00', '#FCBF49', '#2A9D8F', '#219EBC', '#E76F51'];
+const CONFETTI_COLORS = ['#ff0000', '#1a1aff', '#ffff00', '#00e600', '#ff9900', '#ff00ff', '#00e6e6'];
 
 const CONFETTI_PIECES = Array.from({ length: 60 }, (_, i) => ({
   id: i,
