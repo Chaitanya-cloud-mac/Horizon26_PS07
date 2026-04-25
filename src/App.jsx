@@ -492,7 +492,7 @@ export default function App() {
         <div className="game-sidebar">
           <Timer totalSeconds={config.timerSeconds} timeLeft={timeLeft} running={!gameResult} />
 
-          <div className="color-palette">
+          <div className="color-palette" style={{ '--palette-cols': activeColors.length / 2 }}>
             <div className="palette-title">Colours</div>
             {activeColors.map((c) => (
               <div

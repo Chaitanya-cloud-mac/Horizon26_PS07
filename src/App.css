@@ -411,8 +411,8 @@
 
 /* ─── Colour Palette ──────────────────────────────────────────────────────── */
 .color-palette {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(var(--palette-cols, 2), 36px);
   gap: 10px;
   padding: 16px;
   background: var(--bg-card);
@@ -420,10 +420,11 @@
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-sm);
   justify-content: center;
-  max-width: 200px;
+  width: fit-content;
 }
 
 .palette-title {
+  grid-column: 1 / -1;
   width: 100%;
   font-size: .72rem;
   text-transform: uppercase;
