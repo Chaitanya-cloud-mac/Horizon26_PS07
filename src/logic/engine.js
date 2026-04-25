@@ -141,7 +141,7 @@ function saveAllScores(data) {
 /**
  * Calculate the score based on game outcome, difficulty, guesses, and time.
  */
-export function calculateScore(won, difficultyKey, guessCount, timeLeft) {
+export function calculateScore(won, difficultyKey, guessCount, timeLeft, hintsUsed = 0) {
   const { maxGuesses } = DIFFICULTIES[difficultyKey];
   let score = 0;
   
@@ -155,7 +155,12 @@ export function calculateScore(won, difficultyKey, guessCount, timeLeft) {
   }
 
   const multipliers = { easy: 1, medium: 1.5, hard: 2 };
-  return Math.floor(score * (multipliers[difficultyKey] || 1));
+  score = Math.floor(score * (multipliers[difficultyKey] || 1));
+
+  // Hint penalty: flat -200 points per hint (applied after multiplier)
+  score -= hintsUsed * 200;
+
+  return Math.max(0, score);
 }
 
 /**

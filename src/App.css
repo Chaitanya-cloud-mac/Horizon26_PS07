@@ -480,6 +480,33 @@
   cursor: not-allowed;
 }
 
+/* ─── Hint Button ──────────────────────────────────────────────────────────── */
+.hint-btn {
+  padding: 8px 20px;
+  border: 1.5px solid hsl(45, 90%, 50%);
+  border-radius: var(--radius-full);
+  font-weight: 600;
+  font-size: .8rem;
+  cursor: pointer;
+  background: hsla(45, 90%, 50%, .12);
+  color: hsl(45, 90%, 55%);
+  transition: all var(--transition-fast);
+  letter-spacing: .02em;
+}
+
+.hint-btn:hover:not(:disabled) {
+  background: hsla(45, 90%, 50%, .25);
+  transform: translateY(-1px);
+  box-shadow: 0 0 12px hsla(45, 90%, 50%, .3);
+}
+
+.hint-btn:disabled {
+  opacity: .35;
+  cursor: not-allowed;
+  border-color: var(--border-subtle);
+  color: var(--text-muted);
+}
+
 /* ─── Timer ────────────────────────────────────────────────────────────────── */
 .timer-container {
   display: flex;

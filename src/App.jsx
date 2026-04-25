@@ -206,6 +206,7 @@ function LeaderboardModal({ onClose }) {
               <tr>
                 <th>#</th>
                 <th>Player</th>
+                <th>Score</th>
                 <th>Guesses</th>
                 <th>Time Left</th>
               </tr>
@@ -215,6 +216,7 @@ function LeaderboardModal({ onClose }) {
                 <tr key={i}>
                   <td className="lb-rank">{i + 1}</td>
                   <td>{e.name}</td>
+                  <td className="mono" style={{ color: 'var(--accent-1)', fontWeight: 'bold' }}>{e.score !== undefined ? e.score : '-'}</td>
                   <td className="mono">{e.guesses}</td>
                   <td className="mono">{e.timeRemaining}s</td>
                 </tr>
@@ -232,7 +234,7 @@ function LeaderboardModal({ onClose }) {
 /* ═══════════════════════════════════════════════════════════════════════════
    Game Over Overlay
    ═══════════════════════════════════════════════════════════════════════════ */
-function GameOverOverlay({ won, secret, guessCount, timeLeft, difficulty, onPlayAgain, onMenu }) {
+function GameOverOverlay({ won, secret, guessCount, timeLeft, difficulty, hintsUsed, onPlayAgain, onMenu }) {
   const [name, setName] = useState('');
   const [saved, setSaved] = useState(false);
 
@@ -250,7 +252,7 @@ function GameOverOverlay({ won, secret, guessCount, timeLeft, difficulty, onPlay
   const mins = Math.floor(timeLeft / 60);
   const secs = timeLeft % 60;
   const timeString = `${mins} minute${mins !== 1 ? 's' : ''} and ${secs} second${secs !== 1 ? 's' : ''}`;
-  const score = calculateScore(won, difficulty, guessCount, timeLeft);
+  const score = calculateScore(won, difficulty, guessCount, timeLeft, hintsUsed);
 
   return (
     <>
@@ -267,6 +269,11 @@ function GameOverOverlay({ won, secret, guessCount, timeLeft, difficulty, onPlay
 
           <div className="game-over-score" style={{ fontSize: '1.5rem', fontWeight: 'bold', margin: '15px 0', color: won ? 'var(--accent-1)' : 'var(--text-muted)' }}>
             Score: {score}
+            {hintsUsed > 0 && (
+              <div style={{ fontSize: '.8rem', fontWeight: 'normal', color: 'var(--text-muted)', marginTop: 4 }}>
+                💡 {hintsUsed} hint{hintsUsed > 1 ? 's' : ''} used (−{hintsUsed * 200} pts)
+              </div>
+            )}
           </div>
 
           {!won && (
@@ -324,13 +331,17 @@ export default function App() {
   const [difficulty, setDifficulty] = useState(null);  // 'easy' | 'medium' | 'hard'
   const [showLeaderboard, setShowLeaderboard] = useState(false);
 
-  // ── Game State ───────────────────────────────────────────────────────────
+  // ── Game State ─────────────────────────────────────────────────────────────
   const [secret, setSecret] = useState([]);
   const [guesses, setGuesses] = useState([]);          // [{ colors: number[], feedback: {exact, partial} | null }]
   const [currentGuess, setCurrentGuess] = useState([]); // number[] (length = slots, -1 = empty)
   const [gameResult, setGameResult] = useState(null);   // 'won' | 'lost' | null
   const [timeLeft, setTimeLeft] = useState(0);
   const timerRef = useRef(null);
+
+  // ── Hint State ─────────────────────────────────────────────────────────────
+  const [hintsUsed, setHintsUsed] = useState(0);
+  const [revealedHints, setRevealedHints] = useState(new Set()); // slot indices revealed
 
   // ── Drag State ──────────────────────────────────────────────────────────
   const [dragOverSlot, setDragOverSlot] = useState(-1);
@@ -348,6 +359,8 @@ export default function App() {
     setCurrentGuess(new Array(cfg.slots).fill(-1));
     setGameResult(null);
     setTimeLeft(cfg.timerSeconds);
+    setHintsUsed(0);
+    setRevealedHints(new Set());
     setView('playing');
   }, []);
 
@@ -432,10 +445,41 @@ export default function App() {
       setGameResult('lost');
       setView('over');
     } else {
-      // Next guess
-      setCurrentGuess(new Array(config.slots).fill(-1));
+      // Next guess — pre-fill any revealed hint positions
+      const nextGuess = new Array(config.slots).fill(-1);
+      revealedHints.forEach((idx) => {
+        nextGuess[idx] = secret[idx];
+      });
+      setCurrentGuess(nextGuess);
     }
   };
+
+  // ── Hint Handler ───────────────────────────────────────────────────────
+  const useHint = () => {
+    if (view !== 'playing' || gameResult) return;
+    // Find slot indices not yet revealed
+    const unrevealed = [];
+    for (let i = 0; i < config.slots; i++) {
+      if (!revealedHints.has(i)) unrevealed.push(i);
+    }
+    if (unrevealed.length <= 1) return; // Can't reveal the last slot (must guess at least one)
+
+    // Pick a random unrevealed slot
+    const idx = unrevealed[Math.floor(Math.random() * unrevealed.length)];
+    const newRevealed = new Set(revealedHints);
+    newRevealed.add(idx);
+    setRevealedHints(newRevealed);
+    setHintsUsed((h) => h + 1);
+
+    // Fill that slot with the correct colour
+    setCurrentGuess((prev) => {
+      const next = [...prev];
+      next[idx] = secret[idx];
+      return next;
+    });
+  };
+
+  const hintsAvailable = config ? config.slots - 1 - hintsUsed : 0;
 
   // ── Render Helpers ──────────────────────────────────────────────────────
   const allSlotsFilled = currentGuess.every((c) => c !== -1);
@@ -587,6 +631,15 @@ export default function App() {
           </button>
 
           <button
+            className="hint-btn"
+            disabled={hintsAvailable <= 0 || !!gameResult}
+            onClick={useHint}
+            title={`Reveal a correct position (-200 pts). ${hintsAvailable} left`}
+          >
+            💡 Hint ({hintsAvailable})
+          </button>
+
+          <button
             className="action-btn"
             onClick={() => {
               clearInterval(timerRef.current);
@@ -664,6 +717,7 @@ export default function App() {
           guessCount={guesses.length}
           timeLeft={timeLeft}
           difficulty={difficulty}
+          hintsUsed={hintsUsed}
           onPlayAgain={() => startGame(difficulty)}
           onMenu={() => { setView('menu'); setGameResult(null); }}
         />
