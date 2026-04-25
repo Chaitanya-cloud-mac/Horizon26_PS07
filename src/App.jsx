@@ -189,6 +189,10 @@ function GameOverOverlay({ won, secret, guessCount, timeLeft, difficulty, onPlay
     setSaved(true);
   };
 
+  const mins = Math.floor(timeLeft / 60);
+  const secs = timeLeft % 60;
+  const timeString = `${mins} minute${mins !== 1 ? 's' : ''} and ${secs} second${secs !== 1 ? 's' : ''}`;
+
   return (
     <>
       {won && <Confetti />}
@@ -198,7 +202,7 @@ function GameOverOverlay({ won, secret, guessCount, timeLeft, difficulty, onPlay
           <h2 className="game-over-title">{won ? 'Brilliant!' : 'Game Over'}</h2>
           <p className="game-over-sub">
             {won
-              ? `You cracked the code in ${guessCount} guess${guessCount > 1 ? 'es' : ''} with ${timeLeft}s remaining!`
+              ? `You cracked the code in ${guessCount} guess${guessCount > 1 ? 'es' : ''} with ${timeString} remaining!`
               : 'The secret code was:'}
           </p>
 
