@@ -92,7 +92,7 @@ function Timer({ totalSeconds, timeLeft, running }) {
           fontSize="16"
           fontWeight="700"
           fontFamily="'JetBrains Mono', monospace"
-          style={{ transform: 'rotate(90deg)', transformOrigin: '50% 50%' }}
+          transform="rotate(90, 50, 50)"
         >
           {minutes}:{seconds.toString().padStart(2, '0')}
         </text>
