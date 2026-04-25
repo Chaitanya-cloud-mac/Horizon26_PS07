@@ -181,6 +181,35 @@ function FeedbackPips({ exact, partial, totalSlots }) {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
+   Dynamic Background — Valley of fire/light bars
+   ═══════════════════════════════════════════════════════════════════════════ */
+const BG_BAR_COUNT = 15;
+const BG_BARS = Array.from({ length: BG_BAR_COUNT }, (_, i) => {
+  // V-shape height logic: 0.4 at center, 1.0 at edges
+  const center = (BG_BAR_COUNT - 1) / 2;
+  const distFromCenter = Math.abs(i - center);
+  const heightRatio = 0.4 + (distFromCenter / center) * 0.6;
+  return { id: i, h: heightRatio };
+});
+
+function DynamicBackground() {
+  return (
+    <div className="dynamic-bg">
+      {BG_BARS.map((bar) => (
+        <div
+          key={bar.id}
+          className="bg-bar"
+          style={{ 
+            height: `${bar.h * 100}%`,
+            animationDelay: `${bar.id * 0.1}s` 
+          }}
+        />
+      ))}
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
    Leaderboard Modal
    ═══════════════════════════════════════════════════════════════════════════ */
 function LeaderboardModal({ onClose }) {
@@ -903,6 +932,7 @@ export default function App() {
      ═══════════════════════════════════════════════════════════════════════ */
   return (
     <div className="app-wrapper">
+      <DynamicBackground />
       {/* Header */}
       <header className="app-header">
         <h1 className="app-title">Grep-Color</h1>
@@ -920,7 +950,7 @@ export default function App() {
             onClick={() => setSymbolMode((s) => !s)}
             aria-label="Toggle symbol overlay"
           >
-            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+            <svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor">
               <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-15.5c-.83 0-1.5.67-1.5 1.5s.67 1.5 1.5 1.5 1.5-.67 1.5-1.5-.67-1.5-1.5-1.5zM19 9h-4.25v10h-1.5v-5h-2.5v5h-1.5V9H5V7h14v2z"/>
             </svg>
           </button>

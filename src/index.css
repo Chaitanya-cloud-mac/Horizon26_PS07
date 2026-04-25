@@ -56,6 +56,9 @@ body {
   --timer-caution: hsl(42, 90%, 52%);
   --timer-danger:  hsl(0, 72%, 52%);
 
+  /* Dynamic Background */
+  --bg-bar-color: #ff4d00; 
+
   color-scheme: dark;
 }
 
@@ -82,6 +85,9 @@ body {
   --shadow-md: 0 4px 12px hsla(0,0%,0%,.08);
   --shadow-lg: 0 8px 32px hsla(0,0%,0%,.12);
   --shadow-glow: 0 0 24px hsla(174, 72%, 34%, .15);
+
+  /* Dynamic Background */
+  --bg-bar-color: #3b82f6;
 
   color-scheme: light;
 }
