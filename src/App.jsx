@@ -18,11 +18,11 @@ function fireConfetti() {
   const count = 200;
   function fire(particleRatio, opts) {
     // Left cannon
-    confetti(Object.assign({}, { origin: { x: 0, y: 0.7 }, angle: 60 }, opts, {
+    confetti(Object.assign({}, { origin: { x: 0, y: 0.7 }, angle: 60, ticks: 400, zIndex: 1001 }, opts, {
       particleCount: Math.floor(count * particleRatio),
     }));
     // Right cannon
-    confetti(Object.assign({}, { origin: { x: 1, y: 0.7 }, angle: 120 }, opts, {
+    confetti(Object.assign({}, { origin: { x: 1, y: 0.7 }, angle: 120, ticks: 400, zIndex: 1001 }, opts, {
       particleCount: Math.floor(count * particleRatio),
     }));
   }
@@ -166,7 +166,7 @@ function GameOverOverlay({ won, secret, guessCount, timeLeft, difficulty, onPlay
   const [name, setName] = useState('');
   const [saved, setSaved] = useState(false);
 
-  // Fire confetti burst once on mount if the player won
+  // Fire a single confetti burst on mount if the player won
   useEffect(() => {
     if (won) fireConfetti();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
@@ -576,7 +576,6 @@ export default function App() {
 
       {/* Content */}
       <main className="app-content">
-        <div id="cheat-secret" style={{ display: 'none' }}>{secret ? secret.join(',') : ''}</div>
         {view === 'menu' && renderMenu()}
         {(view === 'playing' || view === 'over') && config && renderGame()}
       </main>
