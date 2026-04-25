@@ -1,16 +1,58 @@
-# React + Vite
+# <span style="background: linear-gradient(to right, #3b82f6, #f59e0b, #ef4444); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">Grep-Color</span>
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+**Grep-Color** is a highly-polished, cinematic Mastermind-style deduction game built with React and Vite. It combines classic logic puzzles with a modern, atmospheric aesthetic, featuring dynamic lighting, accessibility-first design, and asynchronous social play.
 
-Currently, two official plugins are available:
+## 🌟 Key Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+### 🎮 Gameplay & Mechanics
+- **Three Difficulty Tiers**: Easy (4 slots/4 colors), Medium (5 slots/6 colors), and Hard (6 slots/8 colors).
+- **Intelligent Feedback**: A robust two-pass deduction engine correctly handles duplicate colors and partial matches.
+- **Hint System**: Stuck? Reveal a correct position at the cost of -200 points. Capped at a maximum of 3 hints to maintain the challenge.
+- **Local Leaderboard**: Track your best scores across different difficulties.
 
-## React Compiler
+### 🎭 Cinematic Aesthetic
+- **Valley of Light**: A dynamic background featuring animated vertical light bars that shift between fiery orange (Dark Mode) and azure blue (Light Mode).
+- **Atmospheric Effects**: Experience high-energy confetti bursts on a win, and a somber rain overlay with ambient audio on a loss.
+- **Multicolored Branding**: A logo that reflects the colors of the three difficulty modes.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### 👥 Social & Multiplayer
+- **Challenge a Friend**: Create your own secret code and generate a unique URL hash. Send it to a friend to see if they can crack your specific code. No backend or database required!
 
-## Expanding the ESLint configuration
+### ♿ Accessibility First
+- **Symbol-Overlay Mode**: Toggle the Universal Access icon to overlay distinct geometric patterns on pegs, making the game fully playable for colorblind users.
+- **No-Color Mode**: When accessibility is active, colors are stripped away to leave high-contrast symbols as the sole identifiers, ensuring zero ambiguity.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## 🛠️ Technology Stack
+- **Frontend**: React (Hooks, Context, Functional Components)
+- **Build Tool**: Vite
+- **Styling**: Vanilla CSS with custom properties (Glassmorphism & Dynamic Animations)
+- **Audio**: Web Audio API for procedural rain sound synthesis
+- **State Management**: LocalStorage for persistence (Leaderboard, Settings, Themes)
+
+## 🚀 Getting Started
+
+### Prerequisites
+- [Node.js](https://nodejs.org/) (v16+)
+- npm or yarn
+
+### Installation
+1. Clone the repository
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Start the development server:
+   ```bash
+   npm run dev
+   ```
+
+## 📜 How to Play
+1. **Choose a Difficulty**: Pick from Easy, Medium, or Hard.
+2. **Make a Guess**: Drag colors into the slots or click a slot then a color.
+3. **Analyze Feedback**: 
+   - **Black Peg**: Correct color in the correct position.
+   - **White Peg**: Correct color but in the wrong position.
+4. **Crack the Code**: Use logic to narrow down the secret pattern before you run out of attempts!
+
+---
+*Built with passion for deduction and design.*
