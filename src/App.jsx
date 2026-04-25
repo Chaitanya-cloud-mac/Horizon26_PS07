@@ -327,7 +327,7 @@ export default function App() {
   }, [theme]);
 
   // ── Views ────────────────────────────────────────────────────────────────
-  const [view, setView] = useState('menu');           // 'menu' | 'playing' | 'over'
+  const [view, setView] = useState('menu');           // 'menu' | 'playing' | 'over' | 'challenge-create'
   const [difficulty, setDifficulty] = useState(null);  // 'easy' | 'medium' | 'hard'
   const [showLeaderboard, setShowLeaderboard] = useState(false);
 
@@ -343,6 +343,14 @@ export default function App() {
   const [hintsUsed, setHintsUsed] = useState(0);
   const [revealedHints, setRevealedHints] = useState(new Set()); // slot indices revealed
 
+  // ── Challenge Mode State ────────────────────────────────────────────────
+  const [challengeDiff, setChallengeDiff] = useState('easy');
+  const [challengeCode, setChallengeCode] = useState([]);
+  const [challengeLink, setChallengeLink] = useState('');
+  const [isChallenge, setIsChallenge] = useState(false);
+  const [linkCopied, setLinkCopied] = useState(false);
+  const [challengeActiveSlot, setChallengeActiveSlot] = useState(0);
+
   // ── Drag State ──────────────────────────────────────────────────────────
   const [dragOverSlot, setDragOverSlot] = useState(-1);
 
@@ -350,9 +358,49 @@ export default function App() {
   const config = difficulty ? DIFFICULTIES[difficulty] : null;
   const activeColors = difficulty ? getColorsForDifficulty(difficulty) : [];
 
+  // ── Challenge Encode / Decode ───────────────────────────────────────────
+  const encodeChallenge = (diff, code) => {
+    const data = JSON.stringify({ d: diff, s: code });
+    return btoa(data);
+  };
+
+  const decodeChallenge = (hash) => {
+    try {
+      const data = JSON.parse(atob(hash));
+      if (data.d && Array.isArray(data.s) && DIFFICULTIES[data.d]) {
+        return { difficulty: data.d, secret: data.s };
+      }
+    } catch (_) { /* invalid hash */ }
+    return null;
+  };
+
+  // ── Detect challenge hash on load ───────────────────────────────────────
+  useEffect(() => {
+    const hash = window.location.hash.replace('#challenge=', '');
+    if (hash && hash !== window.location.hash) {
+      const challenge = decodeChallenge(hash);
+      if (challenge) {
+        const cfg = DIFFICULTIES[challenge.difficulty];
+        setIsChallenge(true);
+        setDifficulty(challenge.difficulty);
+        setSecret(challenge.secret);
+        setGuesses([]);
+        setCurrentGuess(new Array(cfg.slots).fill(-1));
+        setGameResult(null);
+        setTimeLeft(cfg.timerSeconds);
+        setHintsUsed(0);
+        setRevealedHints(new Set());
+        setView('playing');
+        // Clean the URL hash so refreshing doesn't restart
+        window.history.replaceState(null, '', window.location.pathname);
+      }
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   // ── Start Game ──────────────────────────────────────────────────────────
   const startGame = useCallback((diff) => {
     const cfg = DIFFICULTIES[diff];
+    setIsChallenge(false);
     setDifficulty(diff);
     setSecret(generateSecret(diff));
     setGuesses([]);
@@ -363,6 +411,40 @@ export default function App() {
     setRevealedHints(new Set());
     setView('playing');
   }, []);
+
+  // ── Start Challenge Creation ────────────────────────────────────────────
+  const startChallengeCreate = () => {
+    setChallengeDiff('easy');
+    setChallengeCode(new Array(DIFFICULTIES.easy.slots).fill(-1));
+    setChallengeLink('');
+    setLinkCopied(false);
+    setChallengeActiveSlot(0);
+    setView('challenge-create');
+  };
+
+  const generateChallengeLink = () => {
+    if (challengeCode.includes(-1)) return;
+    const encoded = encodeChallenge(challengeDiff, challengeCode);
+    const url = `${window.location.origin}${window.location.pathname}#challenge=${encoded}`;
+    setChallengeLink(url);
+    setLinkCopied(false);
+  };
+
+  const copyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(challengeLink);
+      setLinkCopied(true);
+    } catch (_) {
+      // Fallback
+      const ta = document.createElement('textarea');
+      ta.value = challengeLink;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      setLinkCopied(true);
+    }
+  };
 
   // ── Timer Tick ──────────────────────────────────────────────────────────
   useEffect(() => {
@@ -515,8 +597,134 @@ export default function App() {
       >
         🏆 Leaderboard
       </button>
+      <button
+        className="action-btn challenge-create-btn"
+        style={{ marginTop: 8 }}
+        onClick={startChallengeCreate}
+      >
+        ⚔️ Challenge a Friend
+      </button>
     </div>
   );
+
+  /* ═══════════════════════════════════════════════════════════════════════
+     RENDER — CHALLENGE CREATE
+     ═══════════════════════════════════════════════════════════════════════ */
+  const renderChallengeCreate = () => {
+    const cfg = DIFFICULTIES[challengeDiff];
+    const colors = getColorsForDifficulty(challengeDiff);
+    const allSet = challengeCode.every((c) => c !== -1);
+
+    return (
+      <div className="challenge-create-screen">
+        <h2 className="menu-title" style={{ fontSize: '1.6rem' }}>⚔️ Create a Challenge</h2>
+        <p className="menu-subtitle" style={{ fontSize: '.9rem' }}>
+          Set a secret code and share the link with a friend to challenge them!
+        </p>
+
+        {/* Difficulty Selector */}
+        <div className="challenge-diff-selector">
+          {Object.entries(DIFFICULTIES).map(([key, d]) => (
+            <button
+              key={key}
+              className={`lb-tab${challengeDiff === key ? ' active' : ''}`}
+              onClick={() => {
+                setChallengeDiff(key);
+                setChallengeCode(new Array(d.slots).fill(-1));
+                setChallengeLink('');
+                setLinkCopied(false);
+              }}
+            >
+              {d.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Code Slots */}
+        <p style={{ color: 'var(--text-muted)', fontSize: '.82rem', margin: '12px 0 8px' }}>
+          Click a slot, then pick a colour below:
+        </p>
+        <div className="challenge-slots">
+          {challengeCode.map((colorId, i) => (
+            <div
+              key={i}
+              className={`peg-slot${colorId >= 0 ? ' filled' : ''}`}
+              onClick={() => {
+                setChallengeActiveSlot(i);
+              }}
+              style={{ cursor: 'pointer', outline: challengeActiveSlot === i ? '2px solid var(--accent-1)' : 'none' }}
+            >
+              <div
+                className="peg-inner"
+                style={colorId >= 0 ? { background: COLOR_POOL[colorId].hex } : {}}
+              />
+            </div>
+          ))}
+        </div>
+
+        {/* Colour Palette */}
+        <div className="challenge-palette" style={{ display: 'flex', gap: 8, flexWrap: 'wrap', justifyContent: 'center', marginTop: 12 }}>
+          {colors.map((c) => (
+            <div
+              key={c.id}
+              className="palette-swatch"
+              onClick={() => {
+                if (challengeActiveSlot === -1) return;
+                setChallengeCode((prev) => {
+                  const next = [...prev];
+                  next[challengeActiveSlot] = c.id;
+                  return next;
+                });
+                // Auto-advance to next empty slot
+                setChallengeActiveSlot((prev) => {
+                  const next = challengeCode.findIndex((v, idx) => idx > prev && v === -1);
+                  return next !== -1 ? next : prev;
+                });
+                setChallengeLink('');
+                setLinkCopied(false);
+              }}
+              style={{ background: c.hex, '--swatch-glow': c.hex + '80' }}
+              title={c.name}
+            />
+          ))}
+        </div>
+
+        {/* Generate Button */}
+        <button
+          className="submit-btn"
+          disabled={!allSet}
+          onClick={generateChallengeLink}
+          style={{ marginTop: 20 }}
+        >
+          Generate Challenge Link
+        </button>
+
+        {/* Link Display */}
+        {challengeLink && (
+          <div className="challenge-link-box">
+            <input
+              type="text"
+              readOnly
+              value={challengeLink}
+              className="challenge-link-input"
+              onClick={(e) => e.target.select()}
+            />
+            <button className="action-btn" onClick={copyLink}>
+              {linkCopied ? '✅ Copied!' : '📋 Copy'}
+            </button>
+          </div>
+        )}
+
+        <button
+          className="action-btn"
+          style={{ marginTop: 16, fontSize: '.78rem' }}
+          onClick={() => setView('menu')}
+        >
+          ← Back to Menu
+        </button>
+      </div>
+    );
+  };
 
   /* ═══════════════════════════════════════════════════════════════════════
      RENDER — GAME BOARD
@@ -706,6 +914,7 @@ export default function App() {
       {/* Content */}
       <main className="app-content">
         {view === 'menu' && renderMenu()}
+        {view === 'challenge-create' && renderChallengeCreate()}
         {(view === 'playing' || view === 'over') && config && renderGame()}
       </main>
 

@@ -856,6 +856,65 @@
   box-shadow: inset 0 -3px 6px rgba(0,0,0,.25), inset 0 2px 3px rgba(255,255,255,.15);
 }
 
+/* ─── Challenge Create Screen ──────────────────────────────────────────────── */
+.challenge-create-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  max-width: 500px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.challenge-diff-selector {
+  display: flex;
+  gap: 8px;
+  margin: 12px 0;
+}
+
+.challenge-slots {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin: 8px 0;
+}
+
+.challenge-link-box {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-top: 16px;
+  width: 100%;
+  max-width: 440px;
+}
+
+.challenge-link-input {
+  flex: 1;
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  font-size: .8rem;
+  font-family: 'JetBrains Mono', monospace;
+  outline: none;
+}
+
+.challenge-link-input:focus {
+  border-color: var(--accent-1);
+}
+
+.challenge-create-btn {
+  border: 1.5px solid hsl(30, 90%, 55%) !important;
+  color: hsl(30, 90%, 60%) !important;
+  background: hsla(30, 90%, 55%, .1) !important;
+}
+
+.challenge-create-btn:hover {
+  background: hsla(30, 90%, 55%, .2) !important;
+}
+
 /* ─── Responsive ──────────────────────────────────────────────────────────── */
 @media (max-width: 768px) {
   .game-layout {
