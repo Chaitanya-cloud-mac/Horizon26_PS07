@@ -551,6 +551,15 @@
   animation: slideUp .4s ease both, celebratePulse 2s ease infinite .5s;
 }
 
+/* ── Lose animation sequence ── */
+.game-over-overlay.lose {
+  animation: fadeIn .05s ease both, loseShake .25s ease .05s both, loseDesaturate .5s ease .3s both;
+}
+
+.game-over-card.lose {
+  animation: loseFallIn .45s ease .3s both;
+}
+
 .game-over-emoji {
   font-size: 3.2rem;
   margin-bottom: 16px;

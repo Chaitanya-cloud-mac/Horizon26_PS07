@@ -152,3 +152,22 @@ body {
   from { transform: translateY(40px) scale(.95); opacity: 0; }
   to   { transform: translateY(0)   scale(1);    opacity: 1; }
 }
+
+/* ─── Lose Animation Keyframes ─────────────────────────────────────────────── */
+@keyframes loseShake {
+  0%, 100% { transform: translateX(0); }
+  20%      { transform: translateX(-8px); }
+  40%      { transform: translateX(8px); }
+  60%      { transform: translateX(-5px); }
+  80%      { transform: translateX(5px); }
+}
+
+@keyframes loseDesaturate {
+  from { backdrop-filter: blur(12px) saturate(1); -webkit-backdrop-filter: blur(12px) saturate(1); }
+  to   { backdrop-filter: blur(12px) saturate(0.2); -webkit-backdrop-filter: blur(12px) saturate(0.2); }
+}
+
+@keyframes loseFallIn {
+  from { transform: translateY(-30px); opacity: 0; }
+  to   { transform: translateY(0);     opacity: 1; }
+}

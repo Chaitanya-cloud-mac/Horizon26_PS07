@@ -183,8 +183,8 @@ function GameOverOverlay({ won, secret, guessCount, timeLeft, difficulty, onPlay
 
   return (
     <>
-      <div className="game-over-overlay">
-        <div className={`game-over-card${won ? ' win' : ''}`}>
+      <div className={`game-over-overlay${won ? '' : ' lose'}`}>
+        <div className={`game-over-card${won ? ' win' : ' lose'}`}>
           <div className="game-over-emoji">{won ? '🎉' : '😔'}</div>
           <h2 className="game-over-title">{won ? 'Brilliant!' : 'Game Over'}</h2>
           <p className="game-over-sub">
