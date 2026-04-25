@@ -12,27 +12,42 @@ import {
 
 /* ═══════════════════════════════════════════════════════════════════════════
    Helper — Confetti pieces for win celebration
+   Random values are computed at module scope (once on load) so they are
+   never called during a render cycle, satisfying react-hooks/purity.
    ═══════════════════════════════════════════════════════════════════════════ */
+const CONFETTI_COLORS = ['#E63946', '#F77F00', '#FCBF49', '#2A9D8F', '#219EBC', '#E76F51'];
+
+const CONFETTI_PIECES = Array.from({ length: 60 }, (_, i) => ({
+  id: i,
+  fallX: `${Math.random() * 100}%`,
+  fallDuration: `${2 + Math.random() * 3}s`,
+  fallDelay: `${Math.random() * 1.5}s`,
+  background: CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)],
+  width: `${6 + Math.random() * 8}px`,
+  height: `${6 + Math.random() * 8}px`,
+  borderRadius: Math.random() > 0.5 ? '50%' : '2px',
+}));
+
 function Confetti() {
-  const pieces = Array.from({ length: 60 }, (_, i) => {
-    const colors = ['#E63946', '#F77F00', '#FCBF49', '#2A9D8F', '#219EBC', '#E76F51'];
-    return (
-      <div
-        key={i}
-        className="confetti-piece"
-        style={{
-          '--fall-x': `${Math.random() * 100}%`,
-          '--fall-duration': `${2 + Math.random() * 3}s`,
-          '--fall-delay': `${Math.random() * 1.5}s`,
-          background: colors[Math.floor(Math.random() * colors.length)],
-          width: `${6 + Math.random() * 8}px`,
-          height: `${6 + Math.random() * 8}px`,
-          borderRadius: Math.random() > 0.5 ? '50%' : '2px',
-        }}
-      />
-    );
-  });
-  return <div className="confetti-container">{pieces}</div>;
+  return (
+    <div className="confetti-container">
+      {CONFETTI_PIECES.map((p) => (
+        <div
+          key={p.id}
+          className="confetti-piece"
+          style={{
+            '--fall-x': p.fallX,
+            '--fall-duration': p.fallDuration,
+            '--fall-delay': p.fallDelay,
+            background: p.background,
+            width: p.width,
+            height: p.height,
+            borderRadius: p.borderRadius,
+          }}
+        />
+      ))}
+    </div>
+  );
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -167,7 +182,6 @@ function LeaderboardModal({ onClose }) {
 function GameOverOverlay({ won, secret, guessCount, timeLeft, difficulty, onPlayAgain, onMenu }) {
   const [name, setName] = useState('');
   const [saved, setSaved] = useState(false);
-  const colors = getColorsForDifficulty(difficulty);
 
   const handleSave = () => {
     if (!name.trim()) return;

@@ -18,21 +18,21 @@ export const DIFFICULTIES = {
     colors: 4,
     slots: 4,
     maxGuesses: 8,
-    timerSeconds: 90,
+    timerSeconds: 600,
   },
   medium: {
     label: 'Medium',
     colors: 6,
     slots: 5,
     maxGuesses: 10,
-    timerSeconds: 75,
+    timerSeconds: 420,
   },
   hard: {
     label: 'Hard',
     colors: 8,
     slots: 6,
     maxGuesses: 12,
-    timerSeconds: 60,
+    timerSeconds: 300,
   },
 };
 
